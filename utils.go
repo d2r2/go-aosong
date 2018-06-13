@@ -1,5 +1,12 @@
 package aosong
 
+import (
+	"bytes"
+	"encoding/binary"
+
+	i2c "github.com/d2r2/go-i2c"
+)
+
 // Utility functions
 
 // getS16BE extract 2-byte integer as signed big-endian.
@@ -63,4 +70,20 @@ func calcCRC1(seed byte, buf []byte) byte {
 		}
 	}
 	return seed
+}
+
+// Read byte block from i2c device to struct object.
+func readDataToStruct(i2c *i2c.I2C, byteCount int,
+	byteOrder binary.ByteOrder, obj interface{}) error {
+	buf1 := make([]byte, byteCount)
+	_, err := i2c.ReadBytes(buf1)
+	if err != nil {
+		return err
+	}
+	buf := bytes.NewBuffer(buf1)
+	err = binary.Read(buf, byteOrder, obj)
+	if err != nil {
+		return err
+	}
+	return nil
 }

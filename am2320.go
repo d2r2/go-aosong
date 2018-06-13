@@ -1,7 +1,6 @@
 package aosong
 
 import (
-	"bytes"
 	"encoding/binary"
 	"errors"
 	"time"
@@ -41,15 +40,15 @@ func (v *AM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidit
 	// Wait 3 millisecond according to specification
 	time.Sleep(time.Millisecond * 3)
 	// Read register's results
-	const responcePrefixBytesCount = 2
+	const responsePrefixBytesCount = 2
 	const crcBytesCount = 2
-	buf2 := make([]byte, responcePrefixBytesCount+
+	buf2 := make([]byte, responsePrefixBytesCount+
 		dataBytesCount+crcBytesCount)
 	_, err = i2c.ReadBytes(buf2)
 	if err != nil {
 		return 0, 0, err
 	}
-	// Construct AM2320 read responce
+	// Construct AM2320 read response
 	data := &struct {
 		FunctionCode byte
 		BytesCount   byte
@@ -57,7 +56,8 @@ func (v *AM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidit
 		CRC1         byte
 		CRC2         byte
 	}{}
-	err = binary.Read(bytes.NewBuffer(buf2), binary.BigEndian, data)
+	err = readDataToStruct(i2c, responsePrefixBytesCount+
+		dataBytesCount+crcBytesCount, binary.BigEndian, data)
 	if err != nil {
 		return 0, 0, err
 	}
