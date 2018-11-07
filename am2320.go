@@ -15,15 +15,15 @@ const (
 	CMD_AM2320_WRITE_REGISTERS byte = 0x10 // Write  multiple registers
 )
 
-// AM2320 specific type
-type AM2320 struct {
+// SensorAM2320 specific type
+type SensorAM2320 struct {
 }
 
 // Static cast to verify at compile time
 // that type implement interface.
-var _ SensorInterface = &AM2320{}
+var _ SensorInterface = &SensorAM2320{}
 
-func (v *AM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidity int16,
+func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidity int16,
 	temperature int16, err error) {
 	// Ping sensor: try to read 1 byte to wake up sensor.
 	// Never check up error here, since one will be ever

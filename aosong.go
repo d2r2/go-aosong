@@ -11,9 +11,9 @@ type SensorType int
 
 // Implement Stringer interface.
 func (v SensorType) String() string {
-	if v == DHT12_TYPE {
+	if v == DHT12 {
 		return "DHT12"
-	} else if v == AM2320_TYPE {
+	} else if v == AM2320 {
 		return "AM2320"
 	} else {
 		return "!!! unknown !!!"
@@ -22,9 +22,9 @@ func (v SensorType) String() string {
 
 const (
 	// Aosong Electronics humidity and temperature sensor model DHT12.
-	DHT12_TYPE SensorType = iota
+	DHT12 SensorType = iota
 	// Aosong Electronics humidity and temperature sensor model AM2320.
-	AM2320_TYPE
+	AM2320
 )
 
 // Abstract Aosong Electronics sensor interface
@@ -43,10 +43,10 @@ type Sensor struct {
 func NewSensor(sensorType SensorType) *Sensor {
 	v := &Sensor{sensorType: sensorType}
 	switch sensorType {
-	case AM2320_TYPE:
-		v.sensor = &AM2320{}
-	case DHT12_TYPE:
-		v.sensor = &DHT12{}
+	case AM2320:
+		v.sensor = &SensorAM2320{}
+	case DHT12:
+		v.sensor = &SensorDHT12{}
 	}
 
 	return v

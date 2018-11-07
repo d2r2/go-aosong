@@ -1,18 +1,18 @@
-Aosong Electronics DHT12, AM2320 humidity and temprature sensors
-================================================================
+Aosong Electronics DHT12, AM2320 humidity and temperature sensors
+=================================================================
 
 [![Build Status](https://travis-ci.org/d2r2/go-aosong.svg?branch=master)](https://travis-ci.org/d2r2/go-aosong)
 [![Go Report Card](https://goreportcard.com/badge/github.com/d2r2/go-aosong)](https://goreportcard.com/report/github.com/d2r2/go-aosong)
 [![GoDoc](https://godoc.org/github.com/d2r2/go-aosong?status.svg)](https://godoc.org/github.com/d2r2/go-aosong)
 [![MIT License](http://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-DHT12 ([pdf reference](https://raw.github.com/d2r2/go-aosong/master/docs/DHT12.pdf)) and AM2320 ([pdf reference](https://raw.github.com/d2r2/go-aosong/master/docs/AM2320.pdf)) are relatively cheap and populare among Arduino and Raspberry PI developers.
+DHT12 ([pdf reference](https://raw.github.com/d2r2/go-aosong/master/docs/DHT12.pdf)) and AM2320 ([pdf reference](https://raw.github.com/d2r2/go-aosong/master/docs/AM2320.pdf)) are relatively cheap and popular among Arduino and Raspberry PI developers.
 Both sensors may operate via i2c-bus interface:
-![image](https://raw.github.com/d2r2/go-bsbmp/master/docs/bmp180_bmp280_12.jpg)
+![image](https://raw.github.com/d2r2/go-aosong/master/docs/am2320_dht12.jpg)
 
-Here is a library written in [Go programming language](https://golang.org/) for Raspberry PI and clones, which gives you in the output relative humidity and temperature values (making all necessary i2c-bus interracting and values computing).
+Here is a library written in [Go programming language](https://golang.org/) for Raspberry PI and clones, which gives you in the output relative humidity and temperature values (making all necessary i2c-bus interacting and values computing).
 
-Pay attension that this library only employ i2c-bus interaction approach. Other option to work with the sensors - specific "single bus communication" protocol is not implemented here.
+Pay attention that this library only employ i2c-bus interaction approach. Other option to work with the sensors - specific "single bus communication" protocol is not implemented here.
  
 Golang usage
 ------------
@@ -27,17 +27,15 @@ func main() {
 	}
 	defer i2c.Close()
 
-	sensor := aosong.NewSensor(aosong.DHT12_TYPE)
-	if err != nil {
-		log.Fatal(err)
-	}
+	sensor := aosong.NewSensor(aosong.DHT12)
+
 	log.Printf("Sensor type = %v\n", sensor.GetSensorType())
 	rh, t, err := sensor.ReadRelativeHumidityAndTemperature(i2c)
 	if err != nil {
 		log.Fatal(err)
 	}
 	log.Printf("Relative humidity = %v%%\n", rh)
-	log.Printf("Temprature in celsius = %v*C\n", t)
+	log.Printf("Temperature in celsius = %v*C\n", t)
 }
 ```
 
@@ -54,17 +52,17 @@ Installation
 $ go get -u github.com/d2r2/go-aosong
 ```
 
-Troubleshoting
+Troubleshooting
 --------------
 
 - *How to obtain fresh Golang installation to RPi device (either any RPi clone):*
 If your RaspberryPI golang installation taken by default from repository is outdated, you may consider
-to install actual golang mannualy from official Golang [site](https://golang.org/dl/). Download
+to install actual golang manually from official Golang [site](https://golang.org/dl/). Download
 tar.gz file containing armv6l in the name. Follow installation instructions.
 
 - *How to enable I2C bus on RPi device:*
 If you employ RaspberryPI, use raspi-config utility to activate i2c-bus on the OS level.
-Go to "Interfaceing Options" menu, to active I2C bus.
+Go to "Interfacing Options" menu, to active I2C bus.
 Probably you will need to reboot to load i2c kernel module.
 Finally you should have device like /dev/i2c-1 present in the system.
 
