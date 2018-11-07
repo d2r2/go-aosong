@@ -9,13 +9,13 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-// DHT12 specific type
-type DHT12 struct {
+// SensorDHT12 specific type
+type SensorDHT12 struct {
 }
 
 // Static cast to verify at compile time
 // that type implement interface.
-var _ SensorInterface = &DHT12{}
+var _ SensorInterface = &SensorDHT12{}
 
 // DHT12 sensor read responce according to specification.
 type rawDHT12Responce struct {
@@ -26,7 +26,7 @@ type rawDHT12Responce struct {
 	Checksum         byte
 }
 
-func (v *DHT12) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidity int16,
+func (v *SensorDHT12) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidity int16,
 	temperature int16, err error) {
 	// read 1 byte to wake up sensor
 	// never check error, since one will be every time

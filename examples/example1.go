@@ -25,11 +25,8 @@ func main() {
 	// logger.ChangePackageLogLevel("i2c", logger.InfoLevel)
 	// logger.ChangePackageLogLevel("aosong", logger.InfoLevel)
 
-	// sensor := aosong.NewSensor(aosong.AM2320_TYPE)
-	sensor := aosong.NewSensor(aosong.DHT12_TYPE)
-	if err != nil {
-		lg.Fatal(err)
-	}
+	// sensor := aosong.NewSensor(aosong.AM2320)
+	sensor := aosong.NewSensor(aosong.DHT12)
 	lg.Infof("Sensor type = %v", sensor.GetSensorType())
 
 	rh, t, err := sensor.ReadRelativeHumidityAndTemperature(i2c)
