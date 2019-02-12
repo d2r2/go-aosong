@@ -32,8 +32,12 @@ import (
 
 // Command byte's sequences
 const (
+	CMD_AM2320_WAKE            byte = 0x00 // Wakeup
 	CMD_AM2320_READ_REGISTERS  byte = 0x03 // Reading register data
 	CMD_AM2320_WRITE_REGISTERS byte = 0x10 // Write  multiple registers
+
+	startRegAddr   = 0x00
+	dataBytesCount = 0x04 // Maximum 32 bytes of registers
 )
 
 // SensorAM2320 specific type
@@ -44,31 +48,28 @@ type SensorAM2320 struct {
 // that type implement interface.
 var _ SensorInterface = &SensorAM2320{}
 
+// ReadRelativeHumidityAndTemperatureMult10 - reads the relative humidity and temperature
 func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (humidity int16,
 	temperature int16, err error) {
 	// Ping sensor: try to read 1 byte to wake up sensor.
-	// Never check up error here, since one will be ever
+	// Never check up error here, since one will be ever read
 	buf1 := make([]byte, 1)
+	_, err = i2c.WriteBytes([]byte{CMD_AM2320_WAKE, 0x00, 0x04})
 	_, _ = i2c.ReadBytes(buf1)
+
 	// Send command to read registers
-	const startRegAddr = 0
-	const dataBytesCount = 4 // Maximum 32 bytes of registers
 	_, err = i2c.WriteBytes([]byte{CMD_AM2320_READ_REGISTERS,
 		startRegAddr, dataBytesCount})
 	if err != nil {
 		return 0, 0, err
 	}
+
 	// Wait 3 millisecond according to specification
 	time.Sleep(time.Millisecond * 3)
 	// Read register's results
 	const responsePrefixBytesCount = 2
 	const crcBytesCount = 2
-	buf2 := make([]byte, responsePrefixBytesCount+
-		dataBytesCount+crcBytesCount)
-	_, err = i2c.ReadBytes(buf2)
-	if err != nil {
-		return 0, 0, err
-	}
+
 	// Construct AM2320 read response
 	data := &struct {
 		FunctionCode byte
@@ -88,7 +89,8 @@ func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (h
 		return -1, -1, spew.Errorf("humidity value exceed 100%%: %v", humidity)
 	}
 	temp := getS16BE(data.Data[2:4])
-	var crc uint16 = getU16LE([]byte{data.CRC1, data.CRC2})
+
+	crc := getU16LE([]byte{data.CRC1, data.CRC2})
 	crcBuf := append([]byte{data.FunctionCode, data.BytesCount},
 		data.Data[0:dataBytesCount]...)
 	calcCrc := calcCRC_AM2320(crcBuf)
