@@ -30,7 +30,7 @@ import (
 	"github.com/davecgh/go-spew/spew"
 )
 
-// Command byte's sequences
+// AM2320 command byte's sequences
 const (
 	CMD_AM2320_READ_REGISTERS  byte = 0x03 // Reading register data
 	CMD_AM2320_WRITE_REGISTERS byte = 0x10 // Write  multiple registers
@@ -63,12 +63,7 @@ func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (h
 	// Read register's results
 	const responsePrefixBytesCount = 2
 	const crcBytesCount = 2
-	buf2 := make([]byte, responsePrefixBytesCount+
-		dataBytesCount+crcBytesCount)
-	_, err = i2c.ReadBytes(buf2)
-	if err != nil {
-		return 0, 0, err
-	}
+
 	// Construct AM2320 read response
 	data := &struct {
 		FunctionCode byte
@@ -83,12 +78,7 @@ func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (h
 		return 0, 0, err
 	}
 
-	rh := getS16BE(data.Data[0:2])
-	if rh > 100*10 {
-		return -1, -1, spew.Errorf("humidity value exceed 100%%: %v", humidity)
-	}
-	temp := getS16BE(data.Data[2:4])
-	var crc uint16 = getU16LE([]byte{data.CRC1, data.CRC2})
+	crc := getU16LE([]byte{data.CRC1, data.CRC2})
 	crcBuf := append([]byte{data.FunctionCode, data.BytesCount},
 		data.Data[0:dataBytesCount]...)
 	calcCrc := calcCRC_AM2320(crcBuf)
@@ -101,9 +91,11 @@ func (v *SensorAM2320) ReadRelativeHumidityAndTemperatureMult10(i2c *i2c.I2C) (h
 		lg.Debugf("CRCs verified: CRC from sensor(%v) = calculated CRC(%v)",
 			crc, calcCrc)
 	}
+	rh := getS16BE(data.Data[0:2])
 	if rh > 100*10 {
 		return -1, -1, spew.Errorf("humidity value exceed 100%%: %v", float32(humidity)/10)
 	}
+	temp := getS16BE(data.Data[2:4])
 
 	return rh, temp, nil
 }
