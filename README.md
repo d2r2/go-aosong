@@ -85,7 +85,7 @@ to discover address occupied by peripheral device. To install utility you should
 Contribute authors
 ------------------
 
-* [Efimov Ioan-Alexandru](https://github.com/efimovalex): report [error](https://github.com/d2r2/go-aosong/issues/2).
+* [Efimov Ioan-Alexandru](https://github.com/efimovalex): report an [issue](https://github.com/d2r2/go-aosong/issues/2) and suggested a solution.
 
 
 Contact
